@@ -1,8 +1,8 @@
 const express = require('express');
 const Game = require('../models/Game');
+const User = require('../models/User');
 const verifyToken = require('../middleware/authMiddleware.js');
 const router = express.Router();
-
 
 router.get('/', async (req, res) => {
   try {
@@ -80,3 +80,4 @@ router.delete('/:id', verifyToken, async (req, res) => {
 });
 
 module.exports = router;
+

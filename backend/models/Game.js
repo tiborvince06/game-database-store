@@ -6,12 +6,6 @@ const gameSchema = new mongoose.Schema(
     description: { type: String, required: true },
     price: { type: Number, required: true },
     genre: { type: String, required: true },
-    likedBy: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
   },
   {
     timestamps: true,
