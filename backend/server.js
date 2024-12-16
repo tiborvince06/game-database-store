@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const protectedRoute = require('./routes/protectedRoute');
 const userRoutes = require('./routes/users');
 const gamesRoutes = require('./routes/games');
+const profileRoutes = require('./routes/profile');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/main', protectedRoute);
 app.use('/api/users', userRoutes);
 app.use('/api/games', gamesRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

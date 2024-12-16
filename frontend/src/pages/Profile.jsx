@@ -3,30 +3,59 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 
 const Profile = () => {
-  const [user, setUser ] = useState({});
+  const [user, setUser] = useState(null);
   const [recentActivity, setRecentActivity] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get('/api/users', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        const token = localStorage.getItem('token');
+        const response = await axios.get('/api/profile', {
+          headers: { Authorization: `Bearer ${token}` },
         });
         
-        const users = response.data;
-        setUser (users[0]);
-        setRecentActivity(users[0].recentActivity || []);
-        setFavorites(users[0].favorites || []);
+        const userData = response.data;
+        setUser(userData);
+        setRecentActivity(userData.recentActivity || []);
+        setFavorites(userData.favorites || []);
         
-        console.log('Fetched user data:', users);
+        console.log('Fetched user data:', userData);
       } catch (error) {
         console.error('Error fetching user profile:', error);
+        setError('Failed to load user profile. Please try again later.');
       }
     };
   
     fetchUserProfile();
   }, []);
+
+  const handleUpdateProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put('/api/profile', 
+        { name: newName, email: newEmail },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUser(response.data);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError('Failed to update profile. Please try again.');
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="text-2xl text-red-400">{error}</div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -44,16 +73,37 @@ const Profile = () => {
         transition={{ duration: 0.5 }}
         className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl mx-auto border-2 border-blue-500"
       >
-        <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">User  Profile</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">User Profile</h1>
         <div className="flex items-center mb-6">
           <img
             src={`https://ui-avatars.com/api/?name=${user.name}&background=random`}
-            alt="User  Avatar"
+            alt="User Avatar"
             className="w-20 h-20 rounded-full mr-4 border-2 border-purple-500"
           />
           <div>
-            <h2 className="text-2xl font-semibold text-blue-300">{user.name}</h2>
-            <p className="text-purple-400">{user.email}</p>
+            {isEditing ? (
+              <>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="bg-gray-700 text-blue-300 p-2 rounded mb-2 w-full"
+                  placeholder="New name"
+                />
+                <input
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  className="bg-gray-700 text-blue-300 p-2 rounded mb-2 w-full"
+                  placeholder="New email"
+                />
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-semibold text-blue-300">{user.name}</h2>
+                <p className="text-purple-400">{user.email}</p>
+              </>
+            )}
             <p className="text-blue-200 mb-4">Role: <span className="text-purple-400 font-semibold">{user.role}</span></p>
           </div>
         </div>
@@ -84,8 +134,17 @@ const Profile = () => {
         <motion.button
           whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(66, 153, 225, 0.5)" }}
           className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-300"
+          onClick={() => {
+            if (isEditing) {
+              handleUpdateProfile();
+            } else {
+              setNewName(user.name);
+              setNewEmail(user.email);
+              setIsEditing(true);
+            }
+          }}
         >
-          Edit Profile
+          {isEditing ? 'Save Changes' : 'Edit Profile'}
         </motion.button>
       </motion.div>
     </div>
@@ -93,3 +152,4 @@ const Profile = () => {
 };
 
 export default Profile;
+
