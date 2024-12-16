@@ -17,6 +17,8 @@ module.exports = {
     },
     extend: {
       colors: {
+        blueglow: "#4299e1",
+        purpleglow: "#9f7aea",
         border: "#D3D3D3",
         textcolor: '#D3D3D3',
         bluebright: '#1E90FF',
@@ -55,6 +57,10 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+      },
+      boxShadow: {
+        'neon-blue': '0 0 5px rgba(66, 153, 225, 0.5), 0 0 20px rgba(66, 153, 225, 0.3)',
+        'neon-purple': '0 0 5px rgba(159, 122, 234, 0.5), 0 0 20px rgba(159, 122, 234, 0.3)',
       },
       borderRadius: {
         lg: "var(--radius)",

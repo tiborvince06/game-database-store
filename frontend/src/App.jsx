@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Profile from './pages/Profile';
-import AdminPage from './pages/AdminPage';
+import Navbar from '../src/components/Navbar';
+import Home from '../src/pages/Home';
+import Login from '../src/pages/Login';
+import Register from '../src/pages/Register';
+import Profile from '../src/pages/Profile';
+import AdminPage from '../src/pages/AdminPage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,7 +22,13 @@ function App() {
 
   return (
     <Router>
-      {isAuthenticated && <Navbar userRole={userRole} />}
+      {isAuthenticated && (
+        <Navbar 
+          userRole={userRole} 
+          setIsAuthenticated={setIsAuthenticated} 
+          setUserRole={setUserRole}
+        />
+      )}
       <Routes>
         <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} />
         <Route path="/register" element={<Register />} />
@@ -50,3 +56,4 @@ function App() {
 }
 
 export default App;
+
