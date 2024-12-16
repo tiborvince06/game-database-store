@@ -1,46 +1,42 @@
-import axios from 'axios';
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const GameCard = ({ game }) => {
-
-    const handleLike = async () => {
-        setIsLoading(true);
-        try {
-            const response = await axios.post(`/api/games/${game._id}/like`, {}, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-            });
-    
-            if (response.status === 200) {
-                setIsLiked(!isLiked);
-                onLike(game._id);
-            } else {
-                console.error('Unexpected response:', response);
-            }
-        } catch (error) {
-            console.error('Error liking game:', error.response ? error.response.data : error.message);
-        } finally {
-            setIsLoading(false);
-        }
+    // Construct the image URL based on the game title
+    const formatTitleForImage = (title) => {
+        return title
+            .toLowerCase() // Convert to lowercase
+            .replace(/[:\s]+/g, '-') // Replace spaces and colons with hyphens
+            .replace(/--+/g, '-') // Replace multiple hyphens with a single hyphen
+            .replace(/'/g, ''); // Remove apostrophes if any
     };
+
+    const imageUrl = `/images/${formatTitleForImage(game.title)}.jpg`;
 
     return (
         <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="bg-purpleroyal border-bluebright border-4 rounded-lg shadow-md p-4"
-            style={{ aspectRatio: '1 / 1' }}
+            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(66, 153, 225, 0.5)" }}
+            className="bg-gray-900 border-2 border-blue-500 rounded-lg shadow-lg shadow-blue-500/30 p-6 flex flex-col justify-between"
+            style={{ 
+                aspectRatio: '1 / 1',
+                background: 'linear-gradient(45deg, #1a202c 0%, #2d3748 100%)'
+            }}
         >
-            <h3 className="text-3xl text-white font-bold mb-8 justify-self-center">{game.title}</h3>
-            <p className="text-xl text-white mb-2">{game.description}</p>
-            <p className="text-xl text-white font-semibold mb-2">Price: ${game.price}</p>
-            <p className="text-xl text-white mb-4">Genre: {game.genre}</p>
+            <div>
+                {/* Add the image element here */}
+                <img 
+                    src={imageUrl} 
+                    alt={game.title} 
+                    className="w-full h-48 object-cover rounded-md mb-4" 
+                />
+                <h3 className="text-2xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 font-bold mb-4">{game.title}</h3>
+                <p className="text-blue-200 mb-2 line-clamp-3">{game.description}</p>
+            </div>
+            <div>
+                <p className="text-lg text-purple-400 font-semibold mb-2">Price: ${game.price}</p>
+                <p className="text-lg text-blue-300 mb-4">Genre: {game.genre}</p>
+            </div>
         </motion.div>
     );
 };
 
 export default GameCard;
-
-
-
-
-
