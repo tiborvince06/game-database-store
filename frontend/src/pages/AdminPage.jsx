@@ -25,6 +25,18 @@ const AdminPage = () => {
   const [editingGame, setEditingGame] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  const gameCardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (index) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: index * 0.2,
+        duration: 0.5,
+      },
+    }),
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -108,7 +120,12 @@ const AdminPage = () => {
     <div className="min-h-screen bg-gray-900 text-blue-200 p-8">
       <h1 className="text-4xl font-bold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Admin Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-800 p-8 bg-opacity-90 rounded-lg shadow-lg w-full max-w-2xl mx-auto border-2 border-blue-500 relative z-10 shadow-lg shadow-blue-500/50"
+      >
           <h2 className="text-2xl font-semibold mb-4 text-purple-400">Users</h2>
           <ul className="bg-gray-800 shadow-lg shadow-blue-500/30 rounded-lg divide-y divide-blue-500/30">
             {users.map((user) => (
@@ -119,10 +136,15 @@ const AdminPage = () => {
               </li>
             ))}
           </ul>
-        </div>
-        <div>
+        </motion.div>
+        <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-800 p-8 bg-opacity-90 rounded-lg shadow-lg w-full h-fit max-w-2xl mx-auto border-2 border-blue-500 relative z-10 shadow-lg shadow-blue-500/50"
+      >
           <h2 className="text-2xl font-semibold mb-4 text-purple-400">Create New Game</h2>
-          <form onSubmit={handleSubmit} className="flex flex-col items-center text-center bg-gray-800 shadow-lg shadow-blue-500/30 rounded-lg p-6">
+          <form onSubmit={handleSubmit} className="flex flex-col items-center text-center">
             <div className="mb-4 w-[60%]">
               <label htmlFor="title" className="block text-blue-300 text-sm font-bold mb-2">
                 Title
@@ -194,13 +216,29 @@ const AdminPage = () => {
               Create Game
             </motion.button>
           </form>
-        </div>
+        </motion.div>
       </div>
-      <div className="mt-8">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-gray-800 mt-16 p-8 bg-opacity-90 rounded-lg shadow-lg w-full max-w-[90vw] mx-auto border-2 border-blue-500 relative z-10 shadow-lg shadow-blue-500/50"
+      >
         <h2 className="text-2xl font-semibold mb-4 text-purple-400">Games</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {games.map((game) => (
-            <div key={game._id} className="bg-gray-800 shadow-lg shadow-blue-500/30 rounded-lg p-4">
+        {games.map((game, index) => (
+            <motion.div
+              key={game._id}
+              variants={gameCardVariants}
+              initial="hidden"
+              animate="visible"
+              custom={index} // Pass the index to the variants
+              className="bg-gray-900 border-2 border-blue-500 rounded-lg shadow-lg shadow-blue-500/30 p-6 flex flex-col justify-between"
+              style={{
+                aspectRatio: '3 / 1',
+                background: 'linear-gradient(45deg, #1a202c 0%, #2d3748 100%)'
+              }}
+            >
               <h3 className="text-xl font-semibold text-blue-300 mb-2">{game.title}</h3>
               <p className="text-blue-200 mb-2">{game.description}</p>
               <p className="text-purple-400 mb-2">Price: ${game.price}</p>
@@ -221,10 +259,10 @@ const AdminPage = () => {
                   Delete
                 </motion.button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
       <EditGameModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

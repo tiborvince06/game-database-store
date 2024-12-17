@@ -3,6 +3,7 @@ import axios from 'axios';
 import GameCard from '../components/Gamecard';
 import Navbar from '../components/Navbar';
 import GameDetailModal from '../components/GameDetailModal';
+import { motion } from 'framer-motion';
 
 const Home = () => {
   const [games, setGames] = useState([]);
@@ -34,6 +35,18 @@ const Home = () => {
     setSelectedGame(null);
   };
 
+  const gameCardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (index) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: index * 0.2,
+        duration: 0.5,
+      },
+    }),
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-900">
       <div className="flex-1 p-8 md:p-16">
@@ -41,10 +54,17 @@ const Home = () => {
           Joystick Junkyard
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 hover:cursor-pointer">
-          {games.map((game) => (
-            <div key={game.id} onClick={() => handleGameClick(game)}>
+        {games.map((game, index) => (
+            <motion.div
+              key={game.id}
+              variants={gameCardVariants}
+              initial="hidden"
+              animate="visible"
+              custom={index} // Pass the index to the variants
+              onClick={() => handleGameClick(game)}
+            >
               <GameCard game={game} />
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

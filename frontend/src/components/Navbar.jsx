@@ -1,13 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 
 const Navbar = ({ userRole, setIsAuthenticated, setUserRole }) => {
     const navigate = useNavigate();
+    const [watchedGames, setWatchedGames] = useState([]);
 
     const handleLogout = () => {
         // Clear the token and user role from localStorage
         localStorage.removeItem('token');
-        localStorage.removeItem('userRole');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('role');
         
         // Update the authentication state
         setIsAuthenticated(false);
