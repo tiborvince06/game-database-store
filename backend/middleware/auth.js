@@ -20,7 +20,6 @@ router.post('/register', async (req, res) => {
         
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        console.error('Registration error:', error);
         res.status(500).json({ error: 'Registration failed' });
     }
 });
@@ -28,7 +27,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).populate('watchedGames');
 
         if (!user) {
             return res.status(401).json({ error: 'Authentication failed' });
@@ -46,7 +45,12 @@ router.post('/login', async (req, res) => {
             { expiresIn: '1d' }
         );
 
-        res.status(200).json({ token, userId: user._id, role: user.role });
+        res.status(200).json({ 
+            token, 
+            userId: user._id, 
+            role: user.role,
+            watchedGames: user.watchedGames
+        });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Login failed' });
