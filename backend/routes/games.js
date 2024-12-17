@@ -79,5 +79,50 @@ router.delete('/:id', verifyToken, async (req, res) => {
   }
 });
 
+router.get('/:id', verifyToken, async (req, res) => {
+  try {
+    const game = await Game.findById(req.params.id);
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    // Add the game to the user's watchedGames
+    await User.findByIdAndUpdate(req.user._id, {
+      $addToSet: { watchedGames: game._id }
+    });
+
+    res.json(game);
+  } catch (error) {
+    console.error('Error fetching game:', error);
+    res.status(500).json({ error: 'Failed to fetch game' });
+  }
+});
+
+// New route to handle adding a game to the watched list
+router.post('/watched', verifyToken, async (req, res) => {
+  try {
+    const { gameId } = req.body;
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!user.watchedGames.includes(gameId)) {
+      user.watchedGames.push(gameId);
+      await user.save();
+    }
+
+    // Populate the watchedGames after saving
+    await user.populate('watchedGames');
+
+    res.status(200).json({ message: 'Game added to watched list', watchedGames: user.watchedGames });
+  } catch (error) {
+    console.error('Error adding game to watched list:', error);
+    res.status(500).json({ error: 'Failed to add game to watched list' });
+  }
+});
+
 module.exports = router;
 

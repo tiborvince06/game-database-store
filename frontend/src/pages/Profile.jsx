@@ -1,15 +1,36 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { Joystick, Sword, Swords, Gamepad, Gamepad2 } from 'lucide-react';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
-  const [recentActivity, setRecentActivity] = useState([]);
+  const [watchedGames, setWatchedGames] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
+  const [floatingIcons, setFloatingIcons] = useState([]);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const generateFloatingIcons = () => {
+      const positions = Array.from({ length: 80 }, (_, i) => ({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+      }));
+
+      return positions.map((pos, i) => ({
+        icon: [Joystick, Sword, Swords, Gamepad, Gamepad2][i % 5],
+        initialX: pos.x,
+        initialY: pos.y,
+        duration: 5 + (i * 0.01),
+        delay: -1 * (i * 0.5),
+      }));
+    };
+
+    setFloatingIcons(generateFloatingIcons());
+  }, []);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -21,8 +42,8 @@ const Profile = () => {
         
         const userData = response.data;
         setUser(userData);
-        setRecentActivity(userData.recentActivity || []);
         setFavorites(userData.favorites || []);
+        setWatchedGames(userData.watchedGames || []);
         
         console.log('Fetched user data:', userData);
       } catch (error) {
@@ -66,12 +87,32 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 p-8">
+    <div className="min-h-screen bg-gray-900 p-8 relative overflow-hidden">
+      {floatingIcons.map((item, index) => (
+        <motion.div
+          key={index}
+          className="absolute opacity-50 pointer-events-none"
+          initial={{ x: `${item.initialX}vw`, y: `${item.initialY}vh` }}
+          animate={{
+            x: [`${item.initialX}vw`, `${(item.initialX + 80) % 100}vw`],
+            y: [`${item.initialY}vh`, `${(item.initialY + 70) % 100}vh`],
+          }}
+          transition={{
+            duration: item.duration,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "linear",
+            delay: item.delay,
+          }}
+        >
+          <item.icon className="w-8 h-8 text-blue-300" />
+        </motion.div>
+      ))}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl mx-auto border-2 border-blue-500"
+        className="bg-gray-800 p-8 bg-opacity-90 rounded-lg shadow-lg w-full max-w-2xl mx-auto border-2 border-blue-500 relative z-10 shadow-lg shadow-blue-500/50"
       >
         <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">User Profile</h1>
         <div className="flex items-center mb-6">
@@ -108,26 +149,16 @@ const Profile = () => {
           </div>
         </div>
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-purple-400 mb-2">Recent Activity</h2>
-          <ul className="bg-gray-700 rounded-lg divide-y divide-blue-500/30">
-            {recentActivity.length > 0 ? (
-              recentActivity.map((activity, index) => (
-                <li key={index} className="p-4 text-blue-200">{activity.description}</li>
+          <h2 className="text-xl font-semibold text-purple-400 mb-2">Watched Games</h2>
+          <ul className="bg-gray-700 bg-opacity-80 rounded-lg divide-y divide-blue-500/30">
+            {watchedGames && watchedGames.length > 0 ? (
+              watchedGames.map((game, index) => (
+                <li key={game._id || index} className="p-4 text-blue-200">
+                  {game.title || 'Unknown Game'}
+                </li>
               ))
             ) : (
-              <li className="p-4 text-blue-200">No recent activity.</li>
-            )}
-          </ul>
-        </div>
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-purple-400 mb-2">Favorites</h2>
-          <ul className="bg-gray-700 rounded-lg divide-y divide-blue-500/30">
-            {favorites.length > 0 ? (
-              favorites.map((game, index) => (
-                <li key={index} className="p-4 text-blue-200">{game.title}</li>
-              ))
-            ) : (
-              <li className="p-4 text-blue-200">No favorites added.</li>
+              <li className="p-4 text-blue-200">No watched games.</li>
             )}
           </ul>
         </div>

@@ -1,7 +1,22 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect } from 'react';
+import axios from 'axios';
 
 const GameDetailModal = ({ isOpen, onClose, game }) => {
-    if (!game) return null;
+    useEffect(() => {
+        if (isOpen && game) {
+          const addToWatchedGames = async () => {
+            try {
+              await axios.post('/api/games/watched', { gameId: game._id }, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+              });
+            } catch (error) {
+              console.error('Error adding game to watched list:', error);
+            }
+          };
+          addToWatchedGames();
+        }
+      }, [isOpen, game]);
 
     return (
         <AnimatePresence>
