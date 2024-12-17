@@ -83,3 +83,12 @@
 .glow-animation {
   animation: glow 2s ease-in-out infinite;
 }
+
+.gradient-background {
+  background: linear-gradient(
+    to right,
+    rgba(167, 139, 250, 0.9),
+    rgba(59, 130, 246, 0.9)
+  );
+  min-height: 100vh;
+}
